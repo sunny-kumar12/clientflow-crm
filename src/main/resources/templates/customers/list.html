@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Customers | ClientFlow CRM</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+          rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <!-- Main content -->
+    <main class="main-content">
+
+        <!-- Navbar -->
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+        <section class="dashboard-content">
+
+            <!-- Success message -->
+            <div th:if="${successMessage}"
+                 class="alert alert-success alert-dismissible fade show"
+                 role="alert">
+                <span th:text="${successMessage}"></span>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"></button>
+            </div>
+
+            <!-- Page heading -->
+            <div class="section-heading">
+                <div>
+                    <h2>Customers</h2>
+                    <p>Manage your customer relationships in one place.</p>
+                </div>
+
+                <a th:href="@{/customers/new}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-2"></i>Add Customer
+                </a>
+            </div>
+
+            <!-- Search and filter -->
+            <section class="content-card customer-toolbar">
+                <form th:action="@{/customers}"
+                      method="get"
+                      class="filter-form">
+
+                    <div class="search-field">
+                        <i class="bi bi-search"></i>
+                        <input type="search"
+                               name="keyword"
+                               th:value="${keyword}"
+                               placeholder="Search name, company, email or phone..."
+                               aria-label="Search customers">
+                    </div>
+
+                    <select name="status"
+                            class="form-select status-select"
+                            aria-label="Filter by status">
+                        <option value="">All statuses</option>
+
+                        <option th:each="s : ${statuses}"
+                                th:value="${s}"
+                                th:text="${s}"
+                                th:selected="${s == selectedStatus}">
+                        </option>
+                    </select>
+
+                    <input type="hidden"
+                           name="size"
+                           th:value="${customers.size}">
+
+                    <button type="submit" class="btn btn-primary">
+                        Search
+                    </button>
+
+                    <a th:href="@{/customers}" class="btn btn-light">
+                        Reset
+                    </a>
+                </form>
+            </section>
+
+            <!-- Customer table -->
+            <section class="content-card">
+
+                <div class="card-heading">
+                    <div>
+                        <h3>Customer Directory</h3>
+                        <p>
+                            <span th:text="${customers.totalElements}">0</span>
+                            records found
+                        </p>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table customer-table align-middle">
+
+                        <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Company</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+
+                        <!-- Customer records -->
+                        <tr th:each="customer : ${customers.content}">
+
+                            <td>
+                                <div class="customer-name">
+                                    <span class="customer-avatar"
+                                          th:text="${#strings.substring(customer.name, 0, 1)}">
+                                        C
+                                    </span>
+
+                                    <strong th:text="${customer.name}">
+                                        Customer
+                                    </strong>
+                                </div>
+                            </td>
+
+                            <td th:text="${customer.company != null
+                                          ? customer.company : '—'}">
+                                Company
+                            </td>
+
+                            <td th:text="${customer.email}">
+                                email@example.com
+                            </td>
+
+                            <td th:text="${customer.phone != null
+                                          ? customer.phone : '—'}">
+                                Phone
+                            </td>
+
+                            <td>
+                                <span class="status-badge"
+                                      th:classappend="${customer.status == 'ACTIVE'}
+                                          ? ' status-active'
+                                          : (${customer.status == 'PENDING'}
+                                              ? ' status-pending'
+                                              : ' status-inactive')"
+                                      th:text="${customer.status}">
+                                    ACTIVE
+                                </span>
+                            </td>
+
+                            <td th:text="${customer.createdAt != null
+                                          ? #temporals.format(customer.createdAt, 'dd MMM yyyy')
+                                          : '—'}">
+                                Created date
+                            </td>
+
+                            <td>
+                                <div class="customer-actions">
+
+                                    <!-- Edit customer -->
+                                    <a th:href="@{/customers/{id}/edit(id=${customer.id})}"
+                                       class="btn btn-sm btn-outline-primary"
+                                       title="Edit customer"
+                                       aria-label="Edit customer">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+
+                                    <!-- Archive action: ADMIN only -->
+                                    <div sec:authorize="hasRole('ADMIN')">
+                                        <form th:action="@{/customers/{id}/archive(id=${customer.id})}"
+                                              method="post"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Archive this customer?');">
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    title="Archive customer"
+                                                    aria-label="Archive customer">
+                                                <i class="bi bi-archive"></i>
+                                            </button>
+
+                                        </form>
+                                    </div>
+
+                                </div>
+                            </td>
+
+                        </tr>
+
+                        <!-- Empty state -->
+                        <tr th:if="${customers.empty}">
+                            <td colspan="7" class="empty-state">
+                                <i class="bi bi-people"></i>
+                                <p>No customers found.</p>
+                                <span>
+                                    Try changing your search or add a customer.
+                                </span>
+                            </td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-bar"
+                     th:if="${customers.totalPages > 0}">
+
+                    <span>
+                        Page
+                        <strong th:text="${customers.number + 1}">1</strong>
+                        of
+                        <strong th:text="${customers.totalPages}">1</strong>
+                    </span>
+
+                    <nav aria-label="Customer pagination">
+                        <ul class="pagination pagination-sm mb-0">
+
+                            <!-- Previous -->
+                            <li class="page-item"
+                                th:classappend="${customers.first} ? ' disabled'">
+
+                                <a class="page-link"
+                                   th:href="@{/customers(page=${customers.number - 1},size=${customers.size},keyword=${keyword},status=${selectedStatus})}">
+                                    Previous
+                                </a>
+                            </li>
+
+                            <!-- Page numbers -->
+                            <li class="page-item"
+                                th:each="i : ${#numbers.sequence(0, customers.totalPages - 1)}"
+                                th:classappend="${i == customers.number} ? ' active'">
+
+                                <a class="page-link"
+                                   th:href="@{/customers(page=${i},size=${customers.size},keyword=${keyword},status=${selectedStatus})}"
+                                   th:text="${i + 1}">
+                                    1
+                                </a>
+                            </li>
+
+                            <!-- Next -->
+                            <li class="page-item"
+                                th:classappend="${customers.last} ? ' disabled'">
+
+                                <a class="page-link"
+                                   th:href="@{/customers(page=${customers.number + 1},size=${customers.size},keyword=${keyword},status=${selectedStatus})}">
+                                    Next
+                                </a>
+                            </li>
+
+                        </ul>
+                    </nav>
+                </div>
+
+            </section>
+
+        </section>
+    </main>
+</div>
+
+<!-- Bootstrap JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

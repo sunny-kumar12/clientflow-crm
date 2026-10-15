@@ -1,0 +1,314 @@
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title th:text="${pageTitle} ?: 'Lead Form'">Lead Form</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --text-color: #1f2937;
+            --muted-color: #6b7280;
+            --border-color: #e5e7eb;
+            --background-color: #f5f7fb;
+        }
+
+        body {
+            background: var(--background-color);
+            color: var(--text-color);
+            font-family: Arial, Helvetica, sans-serif;
+            min-height: 100vh;
+        }
+
+        .page-container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: var(--muted-color);
+            margin-bottom: 0;
+        }
+
+        .form-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            box-shadow: 0 8px 28px rgba(31, 41, 55, 0.06);
+            overflow: hidden;
+        }
+
+        .form-card-header {
+            padding: 22px 28px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-card-header h5 {
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .form-card-body {
+            padding: 28px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.92rem;
+            margin-bottom: 8px;
+        }
+
+        .form-control,
+        .form-select {
+            min-height: 44px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+        }
+
+        .required-mark {
+            color: #dc2626;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            padding-top: 24px;
+            margin-top: 24px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        .validation-error {
+            display: block;
+            color: #dc2626;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 576px) {
+            .page-container {
+                padding: 24px 12px;
+            }
+
+            .form-card-body {
+                padding: 20px 16px;
+            }
+
+            .form-card-header {
+                padding: 18px 16px;
+            }
+
+            .page-title {
+                font-size: 1.45rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="page-container">
+
+    <!-- Page heading -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="page-title" th:text="${pageTitle}">Edit Lead</h1>
+            <p class="page-subtitle">
+                Add a new lead or update an existing lead's information.
+            </p>
+        </div>
+
+        <a th:href="@{/leads}" class="btn btn-outline-secondary">
+            &larr; Back to Leads
+        </a>
+    </div>
+
+    <!-- Lead form card -->
+    <div class="form-card">
+
+        <div class="form-card-header">
+            <h5>Lead Information</h5>
+        </div>
+
+        <div class="form-card-body">
+
+            <form th:action="${formAction}"
+                  th:object="${leadForm}"
+                  method="post">
+
+                <!-- Spring Security CSRF token -->
+                <input type="hidden"
+                       th:if="${_csrf != null}"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+
+                <div class="row g-4">
+
+                    <!-- Lead name -->
+                    <div class="col-md-6">
+                        <label for="name" class="form-label">
+                            Lead Name <span class="required-mark">*</span>
+                        </label>
+
+                        <input id="name"
+                               type="text"
+                               class="form-control"
+                               th:field="*{name}"
+                               placeholder="Enter lead name"
+                               required>
+
+                        <span class="validation-error"
+                              th:errors="*{name}"></span>
+                    </div>
+
+                    <!-- Company -->
+                    <div class="col-md-6">
+                        <label for="company" class="form-label">
+                            Company <span class="required-mark">*</span>
+                        </label>
+
+                        <input id="company"
+                               type="text"
+                               class="form-control"
+                               th:field="*{company}"
+                               placeholder="Enter company name"
+                               required>
+
+                        <span class="validation-error"
+                              th:errors="*{company}"></span>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Email Address</label>
+
+                        <input id="email"
+                               type="email"
+                               class="form-control"
+                               th:field="*{email}"
+                               placeholder="name@company.com">
+
+                        <span class="validation-error"
+                              th:errors="*{email}"></span>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label">Phone Number</label>
+
+                        <input id="phone"
+                               type="tel"
+                               class="form-control"
+                               th:field="*{phone}"
+                               placeholder="Enter phone number">
+                    </div>
+
+                    <!-- Status -->
+                    <div class="col-md-6">
+                        <label for="status" class="form-label">
+                            Lead Status <span class="required-mark">*</span>
+                        </label>
+
+                        <select id="status"
+                                class="form-select"
+                                th:field="*{status}"
+                                required>
+                            <option value="">Select status</option>
+
+                            <option th:each="item : ${statuses}"
+                                    th:value="${item}"
+                                    th:text="${item}">
+                            </option>
+                        </select>
+
+                        <span class="validation-error"
+                              th:errors="*{status}"></span>
+                    </div>
+
+                    <!-- Estimated value -->
+                    <div class="col-md-6">
+                        <label for="estimatedValue" class="form-label">
+                            Estimated Value
+                        </label>
+
+                        <input id="estimatedValue"
+                               type="number"
+                               min="0"
+                               step="0.01"
+                               class="form-control"
+                               th:field="*{estimatedValue}"
+                               placeholder="0.00">
+
+                        <span class="validation-error"
+                              th:errors="*{estimatedValue}"></span>
+                    </div>
+
+                </div>
+
+                <!-- Form actions -->
+                <div class="form-actions">
+                    <a th:href="@{/leads}"
+                       class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Save Lead
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
+```

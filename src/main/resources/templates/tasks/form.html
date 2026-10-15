@@ -1,0 +1,400 @@
+
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title th:text="${pageTitle} + ' | ClientFlow'">
+        Create Task | ClientFlow
+    </title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+          rel="stylesheet">
+
+    <style>
+        body {
+            background: #f5f7fb;
+            color: #1e293b;
+            font-family: Arial, sans-serif;
+        }
+
+        .page-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 28px;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .page-header p {
+            color: #64748b;
+            margin-bottom: 0;
+        }
+
+        .form-card {
+            background: #ffffff;
+            border: 1px solid #e8edf4;
+            border-radius: 16px;
+            padding: 28px;
+        }
+
+        .form-section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #334155;
+        }
+
+        .form-control,
+        .form-select {
+            border: 1px solid #dbe2ea;
+            border-radius: 9px;
+            padding: 11px 13px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+        }
+
+        textarea.form-control {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .form-help {
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .form-actions {
+            border-top: 1px solid #e8edf4;
+            margin-top: 28px;
+            padding-top: 22px;
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            border-color: #4f46e5;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+            border-color: #4338ca;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container-fluid p-4 p-lg-5">
+
+    <div class="page-wrapper">
+
+        <!-- Header -->
+        <header class="page-header">
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+                <div>
+
+                    <h1 th:text="${pageTitle}">
+                        Create Task
+                    </h1>
+
+                    <p>
+                        Create and assign a task to a customer or lead.
+                    </p>
+
+                </div>
+
+                <a th:href="@{/tasks}"
+                   class="btn btn-outline-secondary">
+
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Back to Tasks
+
+                </a>
+
+            </div>
+
+        </header>
+
+
+        <!-- Form -->
+        <div class="form-card">
+
+            <form th:action="@{/tasks}"
+                  th:object="${task}"
+                  method="post">
+
+                <!-- Task Details -->
+                <h2 class="form-section-title">
+                    Task Details
+                </h2>
+
+
+                <div class="row g-4">
+
+                    <!-- Title -->
+                    <div class="col-12">
+
+                        <label for="title"
+                               class="form-label">
+
+                            Task Title
+                            <span class="required">*</span>
+
+                        </label>
+
+                        <input type="text"
+                               id="title"
+                               th:field="*{title}"
+                               class="form-control"
+                               placeholder="e.g. Follow up with customer"
+                               maxlength="200"
+                               required>
+
+                    </div>
+
+
+                    <!-- Status -->
+                    <div class="col-12 col-md-6">
+
+                        <label for="status"
+                               class="form-label">
+
+                            Status
+                            <span class="required">*</span>
+
+                        </label>
+
+                        <select id="status"
+                                th:field="*{status}"
+                                class="form-select"
+                                required>
+
+                            <option th:each="status : ${statuses}"
+                                    th:value="${status}"
+                                    th:text="${#strings.replace(
+                                        status.name(),
+                                        '_',
+                                        ' '
+                                    )}">
+                                TODO
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Priority -->
+                    <div class="col-12 col-md-6">
+
+                        <label for="priority"
+                               class="form-label">
+
+                            Priority
+                            <span class="required">*</span>
+
+                        </label>
+
+                        <select id="priority"
+                                th:field="*{priority}"
+                                class="form-select"
+                                required>
+
+                            <option th:each="priority : ${priorities}"
+                                    th:value="${priority}"
+                                    th:text="${priority.name()}">
+                                MEDIUM
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Due Date -->
+                    <div class="col-12 col-md-6">
+
+                        <label for="dueDate"
+                               class="form-label">
+
+                            Due Date
+
+                        </label>
+
+                        <input type="date"
+                               id="dueDate"
+                               th:field="*{dueDate}"
+                               class="form-control">
+
+                        <div class="form-help">
+                            Set a deadline for completing this task.
+                        </div>
+
+                    </div>
+
+
+                    <!-- Customer -->
+                    <div class="col-12 col-md-6">
+
+                        <label for="customerId"
+                               class="form-label">
+
+                            Customer
+
+                        </label>
+
+                        <select id="customerId"
+                                name="customerId"
+                                class="form-select">
+
+                            <option value="">
+                                Select customer
+                            </option>
+
+                            <option th:each="customer : ${customers}"
+                                    th:value="${customer.id}"
+                                    th:text="${customer.name}"
+                                    th:selected="${task.customer != null
+                                                 and task.customer.id == customer.id}">
+
+                                Customer Name
+
+                            </option>
+
+                        </select>
+
+                        <div class="form-help">
+                            Assign this task to a customer.
+                        </div>
+
+                    </div>
+
+
+                    <!-- Lead -->
+                    <div class="col-12 col-md-6">
+
+                        <label for="leadId"
+                               class="form-label">
+
+                            Lead
+
+                        </label>
+
+                        <select id="leadId"
+                                name="leadId"
+                                class="form-select">
+
+                            <option value="">
+                                Select lead
+                            </option>
+
+                            <option th:each="lead : ${leads}"
+                                    th:value="${lead.id}"
+                                    th:text="${lead.name}"
+                                    th:selected="${task.lead != null
+                                                 and task.lead.id == lead.id}">
+
+                                Lead Name
+
+                            </option>
+
+                        </select>
+
+                        <div class="form-help">
+                            Assign this task to a lead.
+                        </div>
+
+                    </div>
+
+
+                    <!-- Description -->
+                    <div class="col-12">
+
+                        <label for="description"
+                               class="form-label">
+
+                            Description
+
+                        </label>
+
+                        <textarea id="description"
+                                  th:field="*{description}"
+                                  class="form-control"
+                                  placeholder="Add details about this task..."
+                                  maxlength="5000"></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Actions -->
+                <div class="form-actions">
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <a th:href="@{/tasks}"
+                           class="btn btn-outline-secondary">
+
+                            Cancel
+
+                        </a>
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            <i class="bi bi-check2-circle me-2"></i>
+
+                            <span th:text="${pageTitle == 'Edit Task'
+                                            ? 'Update Task'
+                                            : 'Save Task'}">
+                                Save Task
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

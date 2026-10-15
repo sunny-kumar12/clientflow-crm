@@ -1,0 +1,66 @@
+<header class="topbar"
+        th:fragment="navbar"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+    <!-- Left section -->
+    <div class="topbar-left">
+        <button type="button"
+                class="menu-toggle"
+                id="menuToggle"
+                aria-label="Toggle sidebar">
+            <i class="bi bi-list"></i>
+        </button>
+
+        <div>
+            <h1 class="page-title">Dashboard</h1>
+            <p class="page-subtitle">
+                Welcome back! Here's your business overview.
+            </p>
+        </div>
+    </div>
+
+    <!-- Right section -->
+    <div class="topbar-actions">
+
+        <!-- Current date -->
+        <span class="today-date" id="todayDate"></span>
+
+        <!-- Notifications -->
+        <button type="button"
+                class="icon-button"
+                aria-label="Notifications">
+            <i class="bi bi-bell"></i>
+            <span class="notification-dot"></span>
+        </button>
+
+        <!-- Authenticated user and logout -->
+        <div class="d-flex align-items-center gap-3">
+
+            <div class="topbar-profile">
+                <div class="avatar">SK</div>
+
+                <div class="profile-details">
+                    <strong sec:authentication="name">
+                        username
+                    </strong>
+                    <small sec:authorize="hasRole('ADMIN')">
+                        Admin
+                    </small>
+                    <small sec:authorize="hasRole('USER')">
+                        User
+                    </small>
+                </div>
+            </div>
+
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit"
+                        class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-box-arrow-right me-1"></i>
+                    Logout
+                </button>
+            </form>
+
+        </div>
+    </div>
+</header>

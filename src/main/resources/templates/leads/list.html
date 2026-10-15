@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Leads | ClientFlow CRM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3">Lead Management</h1>
+            <p class="text-secondary mb-0">Manage prospects and sales opportunities.</p>
+        </div>
+        <a th:href="@{/leads/new}" class="btn btn-primary">+ New Lead</a>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success"
+         th:text="${successMessage}"></div>
+
+    <form method="get" th:action="@{/leads}" class="row g-2 mb-3">
+        <div class="col-md-6">
+            <input class="form-control" name="keyword" th:value="${keyword}"
+                   placeholder="Search name, company or email">
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" name="status">
+                <option value="">All statuses</option>
+                <option th:each="s : ${statuses}" th:value="${s}"
+                        th:text="${s}"
+                        th:selected="${s == selectedStatus}"></option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button class="btn btn-outline-primary" type="submit">Search</button>
+            <a th:href="@{/leads}" class="btn btn-outline-secondary">Reset</a>
+        </div>
+    </form>
+
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Company</th>
+                    <th>Status</th>
+                    <th>Estimated Value</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="lead : ${leads.content}">
+                    <td>
+                        <div class="fw-semibold" th:text="${lead.name}"></div>
+                        <small class="text-secondary" th:text="${lead.email}"></small>
+                    </td>
+                    <td th:text="${lead.company ?: '—'}"></td>
+                    <td><span class="badge text-bg-secondary"
+                              th:text="${lead.status}"></span></td>
+                    <td th:text="${lead.estimatedValue}"></td>
+                    <td th:text="${lead.createdAt}"></td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-sm btn-outline-primary"
+                               th:href="@{/leads/{id}/edit(id=${lead.id})}">Edit</a>
+                            <form sec:authorize="hasRole('ADMIN')"
+                                  th:action="@{/leads/{id}/archive(id=${lead.id})}"
+                                  method="post"
+                                  onsubmit="return confirm('Archive this lead?')">
+                                <button class="btn btn-sm btn-outline-danger"
+                                        type="submit">Archive</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${leads.empty}">
+                    <td colspan="6" class="text-center py-4 text-secondary">
+                        No leads found.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <nav class="mt-3" th:if="${leads.totalPages > 1}">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${leads.first} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/leads(page=${leads.number - 1},keyword=${keyword},status=${selectedStatus})}">
+                    Previous
+                </a>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link"
+                      th:text="|Page ${leads.number + 1} of ${leads.totalPages}|"></span>
+            </li>
+            <li class="page-item" th:classappend="${leads.last} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/leads(page=${leads.number + 1},keyword=${keyword},status=${selectedStatus})}">
+                    Next
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <a th:href="@{/dashboard}" class="btn btn-link mt-3">← Back to Dashboard</a>
+</div>
+</body>
+</html>
